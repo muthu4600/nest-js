@@ -1,0 +1,48 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Books {
+  id: Int!
+  title: String!
+  author: String!
+  description: String!
+}
+
+type Users {
+  id: Int!
+  firstName: String!
+  lastName: String!
+  email: String!
+  password: String!
+  isActive: Boolean!
+}
+
+type Query {
+  getAllBooks: [Books!]!
+  getBookById(id: Int!): Books!
+  getAllUsers: [Users!]!
+  getUser(id: Int!): Users!
+}
+
+type Mutation {
+  addUpdateBook(bookdetails: BookDetails!): [Books!]!
+  addUpdateUser(userDetails: UserDetails!): Users!
+  deleteUser(id: Int!): [Users!]!
+}
+
+input BookDetails {
+  id: Int!
+  title: String!
+  author: String!
+  description: String!
+}
+
+input UserDetails {
+  id: Int
+  firstName: String!
+  lastName: String!
+  email: String!
+  password: String
+  isActive: Boolean
+}
