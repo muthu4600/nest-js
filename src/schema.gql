@@ -2,6 +2,33 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type UserProfile {
+  userId: String!
+  profileId: String!
+  firstName: String!
+  lastName: String!
+  disPlayName: String!
+  dateOfBirth: String!
+  picture: String!
+  gender: String!
+  phoneNumber: String!
+  preferredLanguage: String!
+  preferredCurrency: String!
+  verificationCode: String!
+  countryCode: String!
+  countryName: String!
+}
+
+type User {
+  id: String!
+  email: String!
+  password: String!
+  isActive: String!
+  createdAt: String!
+  updatedAt: String!
+  profile: UserProfile!
+}
+
 type Books {
   id: Int!
   title: String!
@@ -9,26 +36,17 @@ type Books {
   description: String!
 }
 
-type Users {
-  id: Int!
-  firstName: String!
-  lastName: String!
-  email: String!
-  password: String!
-  isActive: Boolean!
-}
-
 type Query {
   getAllBooks: [Books!]!
   getBookById(id: Int!): Books!
-  getAllUsers: [Users!]!
-  getUser(id: Int!): Users!
+  getAllUsers: [User!]!
+  getUser(id: String!): User!
 }
 
 type Mutation {
   addUpdateBook(bookdetails: BookDetails!): [Books!]!
-  addUpdateUser(userDetails: UserDetails!): Users!
-  deleteUser(id: Int!): [Users!]!
+  addUpdateUser(userDetails: UserDetails!): User!
+  deleteUser(id: Int!): [User!]!
 }
 
 input BookDetails {
@@ -39,10 +57,18 @@ input BookDetails {
 }
 
 input UserDetails {
-  id: Int
-  firstName: String!
-  lastName: String!
-  email: String!
+  id: String
+  email: String
   password: String
+  firstName: String
+  lastName: String
+  dateOfBirth: String
+  gender: String
+  phoneNumber: String
+  countryCode: String
+  countryName: String
+  picture: String
+  preferredLanguage: String
+  preferredCurrency: String
   isActive: Boolean
 }

@@ -2,21 +2,13 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    return queryInterface.createTable('Users', {
+    const User = queryInterface.createTable('User', {
       id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         autoIncrement: true,
         unique: true,
         primaryKey: true,
-      },
-      firstName: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      lastName: {
-        type: Sequelize.STRING,
-        allowNull: false
       },
       email: {
         type: Sequelize.STRING,
@@ -38,9 +30,16 @@ module.exports = {
         type: Sequelize.DATE
       }
     });
+    User.associate = (models) => {
+      User.hasMany(models.UserProfile, {
+        foreignKey: 'userId',
+      })
+    };
+
+    return User;
   },
 
   down: async (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('Users');
+    return queryInterface.dropTable('User');
   }
 };

@@ -10,7 +10,8 @@ import { UsersService } from './users/users.service';
 import { AppController } from './app.controller';
 import { BooksResolver } from './books/books.resolver';
 import { UsersResolver } from './users/users.resolver';
-import { User } from './Models/user.model';
+import { User } from './Models/user.entity';
+import { UserProfile } from './Models/userProfile.entity';
 
 @Module({
   imports: [
@@ -21,9 +22,9 @@ import { User } from './Models/user.model';
       username: 'root',
       password: 'Root123!',
       database: 'nest_training',
-      models: [User],
+      models: [User, UserProfile],
     }),
-    SequelizeModule.forFeature([User]),
+    SequelizeModule.forFeature([User, UserProfile],),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: (join(process.cwd(), 'src/schema.gql')),
