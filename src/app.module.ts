@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { SequelizeModule } from '@nestjs/sequelize';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { join } from 'path';
 
 import { AppService } from './app.service';
@@ -13,15 +14,19 @@ import { UsersResolver } from './users/users.resolver';
 import { User } from './Models/user.entity';
 import { UserProfile } from './Models/userProfile.entity';
 
+const configService = new ConfigService();
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      envFilePath: '.env',
+    }),
     SequelizeModule.forRoot({
-      dialect: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: 'Root123!',
-      database: 'nest_training',
+      dialect: configService.get('DIALECT'),
+      host: configService.get('DB_HOST'),
+      port: configService.get('PORT'),
+      username: configService.get('DB_USER_NAME'),
+      password: configService.get('DB_PASSWORD'),
+      database: configService.get('DB_NAME'),
       models: [User, UserProfile],
     }),
     SequelizeModule.forFeature([User, UserProfile],),

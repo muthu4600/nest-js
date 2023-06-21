@@ -46,7 +46,7 @@ type Query {
 type Mutation {
   addUpdateBook(bookdetails: BookDetails!): [Books!]!
   addUpdateUser(userDetails: UserDetails!): User!
-  deleteUser(id: Int!): [User!]!
+  deleteUser(id: String!): [User!]!
 }
 
 input BookDetails {

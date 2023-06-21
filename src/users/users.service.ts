@@ -59,8 +59,13 @@ export class UsersService {
         }
     }
 
-    async delete(id: number) {
+    async delete(id: string) {
         await this.userModel.destroy({ where: { id } });
-        return await this.userModel.findAll({ raw: true });
+        return await this.userModel.findAll({
+            include: [{
+                model: this.UserProfileModel,
+                as: 'profile'
+            }]
+        });
     }
 }
