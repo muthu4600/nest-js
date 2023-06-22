@@ -22,7 +22,7 @@ export class UsersResolver {
   }
 
   @Mutation(returns => [User])
-  async deleteUser(@Args('id', { type: () => Int }) id: number) {
+  async deleteUser(@Args('id', { type: () => String }) id: string) {
     return await this.UsersService.delete(id);
   }
 }
