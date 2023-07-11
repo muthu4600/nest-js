@@ -20,13 +20,22 @@ type UserProfile {
 }
 
 type User {
-  id: String!
-  email: String!
-  password: String!
-  isActive: String!
-  createdAt: String!
-  updatedAt: String!
-  profile: UserProfile!
+  id: String
+  email: String
+  password: String
+  isActive: String
+  createdAt: String
+  updatedAt: String
+  refreshToken: String
+  profile: UserProfile
+}
+
+type userType {
+  result: User
+  results: [User!]
+  status: Int!
+  errorMessage: String
+  token: String
 }
 
 type Books {
@@ -39,14 +48,15 @@ type Books {
 type Query {
   getAllBooks: [Books!]!
   getBookById(id: Int!): Books!
-  getAllUsers: [User!]!
-  getUser(id: String!): User!
+  getAllUsers: userType!
+  getUser(id: String!): userType!
 }
 
 type Mutation {
   addUpdateBook(bookdetails: BookDetails!): [Books!]!
-  addUpdateUser(userDetails: UserDetails!): User!
-  deleteUser(id: String!): [User!]!
+  userLogin(email: String!, password: String!): userType!
+  addUpdateUser(userDetails: UserDetails!): userType!
+  deleteUser(id: String!): userType!
 }
 
 input BookDetails {

@@ -1,27 +1,27 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { UserDetails } from './users.input'
-import { User } from 'src/Models/user.entity';
+import { userType } from './users.commonType';
 @Resolver()
 export class UsersResolver {
   constructor(private UsersService: UsersService) { }
 
-  @Query(returns => [User])
+  @Query(returns => userType)
   async getAllUsers() {
     return await this.UsersService.getAllUsers();
   }
 
-  @Query(returns => User)
+  @Query(returns => userType)
   async getUser(@Args('id', { type: () => String }) id: string) {
     return await this.UsersService.getUser(id);
   }
 
-  @Mutation(returns => User)
+  @Mutation(returns => userType)
   async addUpdateUser(@Args('userDetails') userDetails: UserDetails) {
     return await this.UsersService.addUpdateUser(userDetails);
   }
 
-  @Mutation(returns => [User])
+  @Mutation(returns => userType)
   async deleteUser(@Args('id', { type: () => String }) id: string) {
     return await this.UsersService.delete(id);
   }
@@ -43,16 +43,22 @@ mutation addUpdateUser(
       lastName: $lastName
     }
   ) {
-    id
-    email
-    isActive
-    profile {
-      userId
-      profileId
-      firstName
-      lastName
-      disPlayName
+    result {
+      id
+      email
+      isActive
+      refreshToken
+      profile {
+        userId
+        profileId
+        firstName
+        lastName
+        disPlayName
+      }
     }
+    token
+    status
+    errorMessage
   }
 }
 */

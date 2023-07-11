@@ -1,31 +1,55 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
+import { BadRequestException, Injectable, Inject } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
 import { User } from '../Models/user.entity';
 import { UserProfile } from 'src/Models/userProfile.entity';
 import { UserDetails } from './users.input';
+import validation from 'src/helpers/validation';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+
+const configService = new ConfigService();
+const jwtService = new JwtService();
 
 @Injectable()
 export class UsersService {
     constructor(
-        @InjectModel(User) private userModel: typeof User,
-        @InjectModel(UserProfile) private UserProfileModel: typeof UserProfile,
+        @Inject('USER_REPOSITORY') private userModel: typeof User,
+        @Inject('USER_PROFILE_REPOSITORY') private UserProfileModel: typeof UserProfile,
     ) { }
 
     async getAllUsers() {
-        return await this.userModel.findAll({
+        const userData = await this.userModel.findAll({
             include: [{ model: this.UserProfileModel, as: 'profile' }]
         });
+
+        return {
+            results: userData,
+            status: 200,
+            errorMessage: ''
+        }
     }
 
     async getUser(id: string) {
-        return await this.userModel.findOne({
+        const { status, errorMessage } = validation(id);
+        if (status !== 200) {
+            return {
+                result: [],
+                status,
+                errorMessage
+            }
+        }
+        const userData = await this.userModel.findOne({
             where: {
-                id,
+                id
             },
             include: [{ model: this.UserProfileModel, as: 'profile' }]
         });
+        return {
+            result: userData,
+            status: 200,
+            errorMessage: ''
+        }
     }
 
     async addUpdateUser(userDetails: UserDetails) {
@@ -38,9 +62,15 @@ export class UsersService {
                 raw: true
             });
         } else {
+
+            const userExists = await this.userModel.findOne({
+                where: { email: userDetails.email }
+            });
+            if (userExists) throw new BadRequestException('User already exists');
+
             const salt = await bcrypt.genSalt();
             userDetails.password = await bcrypt.hash(userDetails.password, salt);
-            return await this.userModel.create(
+            const userData = await this.userModel.create(
                 {
                     email: userDetails.email,
                     password: userDetails.password,
@@ -56,16 +86,60 @@ export class UsersService {
                     ],
                 }
             );
+            const tokens = await this.getTokens(userData.id, userData.email);
+            await this.updateTokens(userData.id, tokens.refreshToken);
+
+            return {
+                result: userData,
+                token: tokens.refreshToken,
+                status: 200,
+                errorMessage: ''
+            };
         }
     }
 
     async delete(id: string) {
         await this.userModel.destroy({ where: { id } });
-        return await this.userModel.findAll({
-            include: [{
-                model: this.UserProfileModel,
-                as: 'profile'
-            }]
+        return {
+            status: 200,
+            errorMessage: ''
+        };
+    }
+
+    async getTokens(userId: string, email: string) {
+        const [accessToken, refreshToken] = await Promise.all([
+            jwtService.signAsync(
+                {
+                    sub: userId,
+                    email,
+                },
+                {
+                    secret: configService.get<string>('JWT_SECRET'),
+                    expiresIn: '15m',
+                },
+            ),
+            jwtService.signAsync(
+                {
+                    sub: userId,
+                    email,
+                },
+                {
+                    secret: configService.get<string>('JWT_SECRET'),
+                    expiresIn: '7d',
+                },
+            ),
+        ]);
+
+        return {
+            accessToken,
+            refreshToken,
+        };
+    }
+
+    async updateTokens(id: string, refreshToken: string) {
+        await this.userModel.update(
+            { refreshToken }, {
+            where: { id }
         });
     }
 }

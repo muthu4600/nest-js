@@ -8,7 +8,7 @@ import { UserProfile } from './userProfile.entity';
 @ObjectType()
 export class User extends Model {
 
-    @Field(type => String)
+    @Field(type => String, { nullable: true })
     @Column({
         type: DataType.UUID,
         allowNull: false,
@@ -19,33 +19,37 @@ export class User extends Model {
     })
     id: string;
 
-    @Field(type => String)
+    @Field(type => String, { nullable: true })
     @Column({
         type: DataType.STRING,
         allowNull: false
     })
     email: string;
 
-    @Field(type => String)
+    @Field(type => String, { nullable: true })
     @Column({
         type: DataType.STRING,
         allowNull: false
     })
     password: string
 
-    @Field(type => String)
+    @Field(type => String, { nullable: true })
     @Column({ defaultValue: true })
     isActive: boolean;
 
-    @Field(type => String)
+    @Field(type => String, { nullable: true })
     @Column
     createdAt: Date;
 
-    @Field(type => String)
+    @Field(type => String, { nullable: true })
     @Column
     updatedAt: Date;
 
-    @Field(returns => UserProfile)
+    @Field(type => String, { nullable: true })
+    @Column
+    refreshToken: string;
+
+    @Field(returns => UserProfile, { nullable: true })
     @HasOne(() => UserProfile, {
         foreignKey: 'userId',
         as: 'profile'
